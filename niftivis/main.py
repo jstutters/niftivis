@@ -25,12 +25,13 @@ def make_image(nifti, slc, mask=None):
     return img
 
 
-def grid_image(img, rows, cols, thumb_width=128, thumb_height=128, mask=None):
+def grid_image(img, rows, cols, thumbnail_dims=(128, 128), mask=None):
     """Make a thumbnail grid from a NIFTI image."""
     n_img = rows * cols
     n_slices = img.get_data().shape[2]
     slice_step = n_slices // n_img
     final_image = None
+    thumb_width, thumb_height = thumbnail_dims
     for i, slc in enumerate(range(0, n_slices, slice_step)):
         im = make_image(img, slc, mask)
         im.thumbnail((thumb_width, thumb_height))
@@ -47,13 +48,23 @@ def grid_image(img, rows, cols, thumb_width=128, thumb_height=128, mask=None):
 
 @click.command()
 @click.option("-m", "--mask", type=click.Path(exists=True))
+@click.option("-r", "--rows", type=int, default=5)
+@click.option("-c", "--columns", type=int, default=5)
+@click.option("-w", "--thumbnail-width", "thumbnail_width", type=int, default=128)
+@click.option("-h", "--thumbnail-height", "thumbnail_height", type=int, default=128)
 @click.argument("image", type=click.Path(exists=True))
 @click.argument("thumbnail", type=click.Path())
-def make_thumbnails(image, thumbnail, mask=None):
+def make_thumbnails(image, thumbnail, mask=None, rows=5, columns=5,
+                    thumbnail_width=128, thumbnail_height=128):
     image = nib.load(image)
     if mask:
         mask = nib.load(mask)
-    grid = grid_image(image, 5, 5, mask=mask)
+    grid = grid_image(
+        image,
+        rows,
+        columns,
+        thumbnail_dims=(thumbnail_width, thumbnail_height),
+        mask=mask)
     grid.save(thumbnail)
 
 
