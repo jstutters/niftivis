@@ -25,7 +25,7 @@ def make_image(nifti, slc, mask=None):
         m = mask.get_data()
         mask_as_rgba = np.zeros([d.shape[0], d.shape[1], 4], dtype=np.uint8)
         mask_as_rgba[m[:, :, slc] > 0, 0] = 255
-        mask_as_rgba[m[:, :, slc] > 0, 3] = 255
+        mask_as_rgba[m[:, :, slc] > 0, 3] = 128
         mimg = Image.fromarray(mask_as_rgba, mode="RGBA")
         img = Image.alpha_composite(img, mimg)
     return img
