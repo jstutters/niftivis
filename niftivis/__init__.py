@@ -1,5 +1,4 @@
-from niftivis.main import make_thumbnails
+from niftivis.niftivis import make_thumbnails
 
 
-def cli():
-    make_thumbnails()
+__all__ = ["make_thumbnails"]
