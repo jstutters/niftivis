@@ -4,11 +4,7 @@ import nibabel as nib
 import numpy as np
 
 
-<<<<<<< HEAD
-def make_image(nifti, slc, mask=None, mask_alpha=1.0):
-=======
-def make_image(nifti, slc, mask=None, rotate=True):
->>>>>>> 02751e44cba35786154f364b6662c5de37befd23
+def make_image(nifti, slc, mask=None, rotate=True, mask_alpha=0.5):
     """Turn a single slice from a NIFTI image into an RGBA image."""
     d = nifti.get_data()
     d = d / 16
@@ -33,13 +29,9 @@ def make_image(nifti, slc, mask=None, rotate=True):
         m = mask.get_data()
         mask_as_rgba = np.zeros([d.shape[0], d.shape[1], 4], dtype=np.uint8)
         mask_as_rgba[m[:, :, slc] > 0, 0] = 255
-<<<<<<< HEAD
         mask_as_rgba[m[:, :, slc] > 0, 3] = int(255 * mask_alpha)
-=======
-        mask_as_rgba[m[:, :, slc] > 0, 3] = 128
         if rotate:
             mask_as_rgba = np.rot90(mask_as_rgba)
->>>>>>> 02751e44cba35786154f364b6662c5de37befd23
         mimg = Image.fromarray(mask_as_rgba, mode="RGBA")
         img = Image.alpha_composite(img, mimg)
     return img
@@ -51,6 +43,8 @@ def grid_image(img, rows, cols, thumbnail_dims=(128, 128), mask=None, from_slice
     n_img = rows * cols
     n_slices = img.get_data().shape[2]
     if to_slice is None:
+        to_slice = n_slices
+    elif to_slice > n_slices:
         to_slice = n_slices
     elif to_slice < 0:
         to_slice = n_slices + to_slice
@@ -81,7 +75,7 @@ def grid_image(img, rows, cols, thumbnail_dims=(128, 128), mask=None, from_slice
 @click.option("-f", "--from", "from_slice", type=int, default=0)
 @click.option("-t", "--to", "to_slice", type=int)
 @click.option("--rotate", flag_value=True, default=False)
-@click.version_option(version="0.1.0")
+@click.version_option(version="2020.06.1")
 @click.argument("image", type=click.Path(exists=True))
 @click.argument("thumbnail", type=click.Path())
 def make_thumbnails(image, thumbnail, mask=None, rows=5, columns=5,
@@ -97,16 +91,14 @@ def make_thumbnails(image, thumbnail, mask=None, rows=5, columns=5,
         image,
         rows,
         columns,
-        start_slice=start_slice,
-        end_slice=end_slice,
-        thumbnail_dims=(thumbnail_width, thumbnail_height),
-        mask=mask,
         from_slice=from_slice,
         to_slice=to_slice,
+        thumbnail_dims=(thumbnail_width, thumbnail_height),
+        mask=mask,
         rotate=rotate
     )
     grid.save(thumbnail)
 
 
 if __name__ == "__main__":
-    make_thumbnails()
+    make_thumbnails() # pylint: disable=no-value-for-parameter

@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="niftivis",
-    version="2020.01.1",
+    version="2020.06.1",
     py_modules=["niftivis"],
     install_requires=[
         "Click",
